@@ -42,7 +42,7 @@ ifeq ($(PLATFORM), HOST)
 	CC = gcc
 	CFLAGS = $(FLAGS)
 	CPPFLAGs = -DHOST $(INCLUDES)
-	LDFLAGS = -wl, -Map=$(TARGET).map
+	LDFLAGS = -Wl,-Map=$(TARGET).map
 	SIZE = size
 else
 	LINKER_FILE = -T msp432p401r.lds
@@ -59,7 +59,7 @@ else
 	CC = arm-none-eabi-gcc
 	LINKER_PATH = -L ../
 	CFLAGS = $(FLAGS) $(ARCH_FlAGS) -mcpu=$(CPU) -march=$(ARCH) --specs=$(SPECS)
-	LDFLAGS = -wl, -MAP=$(TARGET).map, $(LINKER_PATH) $(LINKER_FILE)
+	LDFLAGS = -Wl,-Map=$(TARGET).map $(LINKER_PATH) $(LINKER_FILE)
 	SIZE = size
 endif
 
@@ -72,35 +72,35 @@ PRES = $(SOURCES:=.c=.i)
 
 # Here goes the -c flag to stop before linking
  %.o : %.c
- 	%(CC) -c $< $(CPPFLAGs) $(CFLAGS) -o $@
+		%(CC) -c $< $(CPPFLAGs) $(CFLAGS) -o $@
 
 # Here go the -E -M flags to generate the dependancies
 %.d : %.c
-	%(CC) = -E -M $< $(CPPFLAGs) -o $@
+		%(CC) = -E -M $< $(CPPFLAGs) -o $@
 
 # Here goes the -S flag to create the assembly file
 %.asm : %.c
-	%(CC) = -S $< $(CPPFLAGs) $(CFLAGS) -o $@
+		%(CC) = -S $< $(CPPFLAGs) $(CFLAGS) -o $@
 
 # Here goes the -E to generate the preprocess file
 %.i : %.c
-	$(CC) -E $< $(CPPFLAGs) -o $@
+		$(CC) -E $< $(CPPFLAGs) -o $@
 
 # We add the phony that will be used to call the builds
 
 # compile-all->generate object files from source files but do not link them
 .PHONY: compile-all
-	compile-all:$(OBJS)
+compile-all:$(OBJS)
 
 # build->this will create the out, map, object, and dependancies for the sources
 .PHONY: build
-	build: $(DEPS)
-	build: $(TARGET).out
+build: $(DEPS)
+build: $(TARGET).out
 
 $(TARGET).out: $(OBJS)
-	$(CC) $(OBJS) $(CPPFLAGs) $(CFLAGS) $(LDFLAGS) -o $@
-	$(SIZE) $@
+		$(CC) $(OBJS) $(CPPFLAGs) $(CFLAGS) $(LDFLAGS) -o $@
+		$(SIZE) $@
 
 # clean->this will purge all files except the initial files that were there
 .PHONY: clean
-	clean: rm -f $(OBJS) $(DEPS) $(ASMS) $(PRES) $(TARGET).out $(TARGET).map 
+clean: rm -f $(OBJS) $(DEPS) $(ASMS) $(PRES) $(TARGET).out $(TARGET).map 
